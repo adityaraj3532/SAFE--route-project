@@ -1,10 +1,10 @@
-# Damelyst - Where Safety Meets Direction
+# Safe route  - Where Safety Meets Direction
 
 ### Agentic AI model for Safer Routes, Smarter Journeys
 
-Damelyst is a multi-agent GeoAI platform that helps women compare routes using safety signals such as lighting, public activity, visibility, main-road quality, emergency proximity and recent verified incidents.
+Safe route  is a multi-agent GeoAI platform that helps women compare routes using safety signals such as lighting, public activity, visibility, main-road quality, emergency proximity and recent verified incidents.
 
-Rather than selecting only the shortest route, Damelyst recommends the **safer available route** while clearly showing safety, confidence, risk and uncertainty.
+Rather than selecting only the shortest route, Safe route  recommends the **safer available route** while clearly showing safety, confidence, risk and uncertainty.
 
 ## Features
 

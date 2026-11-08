@@ -3432,3 +3432,30 @@ footer {
     font-size: 7px;
   }
 }
+
+.location-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--card-bg, #fff);
+  color: var(--text);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px #0002;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.location-suggestions:empty { display: none; }
+.location-suggestions button, .location-suggestions span {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+}
+.location-suggestions button:hover, .location-suggestions button:focus-visible { background: #22c55e22; }
+.location-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+.location-actions button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px; color: inherit; background: #22c55e22; }
+.dark .location-suggestions { background: #17251e; }

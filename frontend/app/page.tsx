@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 import { demoRoutes, type Route } from "./data/demoRoutes";
-import { findWalkingRoutes } from "./data/routeApi";
+import { findWalkingRoutes, type Place } from "./data/routeApi";
 
 import Navbar from "./components/Navbar";
 import Map from "./components/Map";
@@ -62,8 +62,8 @@ export default function Home() {
   /* SEARCH */
   /* ========================================= */
 
-  const handleSearch = async (from: string, to: string) => {
-    if (from.trim().length < 3 || to.trim().length < 3) {
+  const handleSearch = async (from: string | Place, to: string | Place) => {
+    if ((typeof from === "string" && from.trim().length < 3) || (typeof to === "string" && to.trim().length < 3)) {
       setSearchMessage("Enter at least three characters for each location.");
       return;
     }
@@ -71,7 +71,7 @@ export default function Home() {
     setPending(true);
     setSearchMessage("Finding walking routes…");
     try {
-      const analysis = await findWalkingRoutes(from.trim(), to.trim());
+      const analysis = await findWalkingRoutes(typeof from === "string" ? from.trim() : from, typeof to === "string" ? to.trim() : to);
       setLiveRoutes(analysis.routes.map((route, index) => {
         const count = route.incidents?.length;
         return {

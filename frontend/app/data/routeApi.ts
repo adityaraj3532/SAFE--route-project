@@ -1,5 +1,5 @@
 type Coordinates = { lon: number; lat: number };
-type Place = Coordinates & { label: string };
+export type Place = Coordinates & { label: string };
 
 export type LineString = {
   type: "LineString";
@@ -37,7 +37,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return response.json();
 }
 
-async function resolvePlace(address: string, field: string): Promise<Place> {
+export function searchPlaces(address: string, signal: AbortSignal) {
+  return request<Place[]>(`/v1/geocode/search?${new URLSearchParams({ q: address })}`, { signal });
+}
+
+async function resolvePlace(address: string | Place, field: string): Promise<Place> {
+  if (typeof address !== "string") return address;
   const query = new URLSearchParams({ q: address });
   const places = await request<Place[]>(`/v1/geocode/search?${query}`);
   const place = places[0];
@@ -45,7 +50,7 @@ async function resolvePlace(address: string, field: string): Promise<Place> {
   return place;
 }
 
-export async function findWalkingRoutes(from: string, to: string) {
+export async function findWalkingRoutes(from: string | Place, to: string | Place) {
   const [start, end] = await Promise.all([
     resolvePlace(from, "starting location"),
     resolvePlace(to, "destination"),

@@ -55,7 +55,7 @@ export default function RouteCard({
           <p>{route.description}</p>
         </div>
 
-        <SafetyScore score={route.safetyScore} />
+        {route.safetyScore !== null && <SafetyScore score={route.safetyScore} />}
       </div>
 
       {/* ================================= */}
@@ -107,7 +107,7 @@ export default function RouteCard({
             </span>
 
             <strong>
-              {route.lighting}%
+              {route.lighting === null ? "Unavailable" : `${route.lighting}%`}
             </strong>
           </div>
         </div>
@@ -140,7 +140,9 @@ export default function RouteCard({
           <span>Safety level</span>
 
           <strong>
-            {route.safetyScore >= 90
+            {route.safetyScore === null
+              ? "Unavailable"
+              : route.safetyScore >= 90
               ? "Excellent"
               : route.safetyScore >= 75
               ? "Good"
@@ -148,14 +150,11 @@ export default function RouteCard({
           </strong>
         </div>
 
-        <div className="route-progress">
-          <div
-            className="route-progress-fill"
-            style={{
-              width: `${route.safetyScore}%`,
-            }}
-          />
-        </div>
+        {route.safetyScore !== null && (
+          <div className="route-progress">
+            <div className="route-progress-fill" style={{ width: `${route.safetyScore}%` }} />
+          </div>
+        )}
 
       </div>
 

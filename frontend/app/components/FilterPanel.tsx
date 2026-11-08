@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 type FilterPanelProps = {
+  disabled: boolean;
   minSafety: number;
   setMinSafety: (value: number) => void;
   wellLitOnly: boolean;
@@ -15,6 +16,7 @@ type FilterPanelProps = {
 };
 
 export default function FilterPanel({
+  disabled,
   minSafety,
   setMinSafety,
   wellLitOnly,
@@ -51,7 +53,7 @@ export default function FilterPanel({
             <h3>Route Filters</h3>
 
             <span>
-              Customize your journey
+              {disabled ? "Safety scores and lighting are unavailable for live routes" : "Customize your journey"}
             </span>
           </div>
 
@@ -60,6 +62,7 @@ export default function FilterPanel({
         <button
           type="button"
           className="filter-reset"
+          disabled={disabled}
           onClick={resetFilters}
           title="Reset filters"
         >
@@ -93,12 +96,13 @@ export default function FilterPanel({
         </div>
 
         <div className="safety-status">
-          {getSafetyLabel()}
+          {disabled ? "Unavailable" : getSafetyLabel()}
         </div>
 
         <input
           className="safety-slider"
           type="range"
+          disabled={disabled}
           min="0"
           max="100"
           value={minSafety}
@@ -153,6 +157,7 @@ export default function FilterPanel({
 
             <input
               type="checkbox"
+              disabled={disabled}
               checked={wellLitOnly}
               onChange={(event) =>
                 setWellLitOnly(event.target.checked)

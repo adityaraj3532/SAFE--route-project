@@ -12,7 +12,8 @@ import {
   Route as RouteIcon,
 } from "lucide-react";
 
-import { demoRoutes } from "./data/demoRoutes";
+import { demoRoutes, type Route } from "./data/demoRoutes";
+import { findWalkingRoutes } from "./data/routeApi";
 
 import Navbar from "./components/Navbar";
 import Map from "./components/Map";
@@ -24,6 +25,9 @@ export default function Home() {
   /* ========================================= */
   /* STATE */
   /* ========================================= */
+
+  const [liveRoutes, setLiveRoutes] = useState<Route[] | null>(null);
+  const [pending, setPending] = useState(false);
 
   const [minSafety, setMinSafety] = useState(0);
 
@@ -41,36 +45,59 @@ export default function Home() {
   /* ========================================= */
 
   const filteredRoutes = useMemo(() => {
+    if (liveRoutes !== null) return liveRoutes;
+
     return demoRoutes.filter((route) => {
       const safetyMatch =
-        route.safetyScore >= minSafety;
+        (route.safetyScore ?? 0) >= minSafety;
 
       const lightingMatch =
-        !wellLitOnly || route.lighting >= 70;
+        !wellLitOnly || (route.lighting ?? 0) >= 70;
 
       return safetyMatch && lightingMatch;
     });
-  }, [minSafety, wellLitOnly]);
+  }, [liveRoutes, minSafety, wellLitOnly]);
 
   /* ========================================= */
   /* SEARCH */
   /* ========================================= */
 
-  const handleSearch = (
-    from: string,
-    to: string
-  ) => {
-    if (!from.trim() || !to.trim()) {
-      setSearchMessage(
-        "Please enter both your starting point and destination."
-      );
-
+  const handleSearch = async (from: string, to: string) => {
+    if (from.trim().length < 3 || to.trim().length < 3) {
+      setSearchMessage("Enter at least three characters for each location.");
       return;
     }
 
-    setSearchMessage(
-      `Finding safer routes from ${from} to ${to}...`
-    );
+    setPending(true);
+    setSearchMessage("Finding walking routes…");
+    try {
+      const analysis = await findWalkingRoutes(from.trim(), to.trim());
+      setLiveRoutes(analysis.routes.map((route, index) => {
+        const count = route.incidents?.length;
+        return {
+          id: route.id,
+          name: `Walking Route ${index + 1}`,
+          distance: `${(route.distance_m / 1000).toFixed(2)} km`,
+          duration: `${Math.ceil(route.duration_s / 60)} min`,
+          safetyScore: null,
+          lighting: null,
+          crowdLevel: "Unavailable",
+          description: count === undefined
+            ? "Incident data unavailable."
+            : `${count} recent community-confirmed ${count === 1 ? "report" : "reports"} nearby.`,
+          color: ["#16a34a", "#2563eb", "#b45309"][index % 3],
+          geometry: route.geometry,
+        };
+      }));
+      setSelectedRoute(0);
+      setMinSafety(0);
+      setWellLitOnly(false);
+      setSearchMessage(`${analysis.startLabel} → ${analysis.endLabel}. ${analysis.note}`);
+    } catch (error) {
+      setSearchMessage(error instanceof Error ? error.message : "Could not find walking routes.");
+    } finally {
+      setPending(false);
+    }
   };
 
   /* ========================================= */
@@ -146,12 +173,13 @@ export default function Home() {
 
           <SearchBox
             onSearch={handleSearch}
+            pending={pending}
           />
 
           {/* Search status */}
 
           {searchMessage && (
-            <div className="search-message">
+            <div className="search-message" role="status">
               <Sparkles size={15} />
 
               <span>
@@ -243,7 +271,7 @@ export default function Home() {
 
                 <span className="map-status-dot" />
 
-                Live
+                {liveRoutes === null ? "Demo" : "Live"}
 
               </div>
 
@@ -252,6 +280,7 @@ export default function Home() {
             <div className="map-container-wrapper">
 
               <Map
+                routes={filteredRoutes}
                 selectedRoute={safeSelectedRoute}
               />
 
@@ -269,7 +298,7 @@ export default function Home() {
                   </strong>
 
                   <span>
-                    Routes ranked by safety
+                    {liveRoutes === null ? "Sample route data" : "Balanced walking routes"}
                   </span>
                 </div>
 
@@ -288,6 +317,7 @@ export default function Home() {
             {/* Filters */}
 
             <FilterPanel
+              disabled={liveRoutes !== null}
               minSafety={minSafety}
               setMinSafety={setMinSafety}
               wellLitOnly={wellLitOnly}
@@ -388,7 +418,7 @@ export default function Home() {
           </h2>
 
           <p>
-            SafeRoutes doesn't simply calculate
+            SafeRoutes doesn’t simply calculate
             the shortest path. It helps you choose
             a route that feels safer.
           </p>

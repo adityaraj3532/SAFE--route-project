@@ -1,13 +1,16 @@
+import type { LineString } from "./routeApi";
+
 export type Route = {
   id: number;
   name: string;
   distance: string;
   duration: string;
-  safetyScore: number;
-  lighting: number;
+  safetyScore: number | null;
+  lighting: number | null;
   crowdLevel: string;
   description: string;
   color: string;
+  geometry?: LineString;
 };
 
 export const demoRoutes: Route[] = [

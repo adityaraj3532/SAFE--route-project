@@ -1,6 +1,6 @@
 # SafeRoutes
 
-The SafeRoutes API compares walking alternatives by travel time and recent community-confirmed reports. It connects to Geoapify for address suggestions, OpenRouteService for walking directions, and Supabase for accounts and incident data. The existing Next.js frontend still displays its sample routes. Use the API documentation to try the backend.
+The SafeRoutes API compares walking alternatives by travel time and recent community-confirmed reports. It connects to Geoapify for address suggestions, OpenRouteService for walking directions, and Supabase for accounts and incident data. The existing Next.js frontend displays sample routes until a successful search and uses the API to find live walking routes.
 
 ## Run in VS Code on Windows
 
@@ -41,6 +41,21 @@ uv run --locked uvicorn app.main:app --reload --port 8000
 ```
 
 Open [FastAPI docs](http://localhost:8000/docs) or [health](http://localhost:8000/health). The health endpoint reports which integrations are configured.
+
+
+### 3. Run the existing frontend
+
+In a second terminal, run the commands below from the repository root. Node.js 22 or newer is recommended.
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Open [SafeRoutes](http://localhost:3000). Enter both addresses with their city names and click **Find Safe Route**. The app uses the top geocoding match for each address and shows the resolved locations. Live searches use balanced ranking. Safety scores, lighting, and activity stay unavailable when the API has no data for them.
+
+The frontend calls `http://localhost:8000` by default. To use a different backend, set `NEXT_PUBLIC_API_URL` in `frontend/.env.local` before starting or building Next.js. Add the frontend origin to `FRONTEND_ORIGINS` in the backend environment. For an HTTPS frontend, use an HTTPS backend URL. Keep provider and Supabase secret keys in the backend environment.
 
 ## API
 
